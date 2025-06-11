@@ -15,7 +15,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (Object.values(req.body).includes(""))
-    return res.status(404).json({ msg: "Debes llenar todos los campos" });
+    return res.status(400).json({ msg: "Debes llenar todos los campos" });
 
   const administradorBDD = await Administrador.findOne({ email }).select(
     "-status -__v -token -updatedAt -createdAt"
@@ -30,7 +30,7 @@ const login = async (req, res) => {
   const verificarPassword = await administradorBDD.matchPassword(password);
 
   if (!verificarPassword)
-    return res.status(404).json({ msg: "La contraseña no es correcta" });
+    return res.status(401).json({ msg: "La contraseña no es correcta" });
 
   const token = generarJWT(administradorBDD._id, "Administrador");
 
@@ -52,9 +52,7 @@ const login = async (req, res) => {
 const perfil = async (req, res) => {
   const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
   if (rol !== "Administrador")
-    return res
-      .status(404)
-      .json({ msg: "No tienes permisos para realizar esta acción" });
+    return res.status(403).json({ msg: "No tienes permisos para realizar esta acción" });
   const administradorBDD = await Administrador.findById(idToken).select(
     "-status -__v -token -updatedAt -createdAt"
   );
@@ -84,7 +82,7 @@ const registro = async (req, res) => {
   const verificarEmailBDD = await Administrador.findOne({ email });
 
   if (verificarEmailBDD)
-    return res.status(400).json({ msg: "El email ya está registrado" });
+    return res.status(409).json({ msg: "El email ya está registrado" });
 
   const nuevoAdministrador = new Administrador(req.body);
 
@@ -99,8 +97,7 @@ const registro = async (req, res) => {
   await nuevoAdministrador.save();
 
   res
-    .status(200)
-    .json({ msg: "Revisa tu correo electrónico para confirmar tu cuenta" });
+    .status(200).json({ msg: "Revisa tu correo electrónico para confirmar tu cuenta" });
 };
 
 // Método para confirmar el token
@@ -113,7 +110,7 @@ const confirmEmail = async (req, res) => {
   });
 
   if (!administradorBDD?.token)
-    return res.status(404).json({ msg: "La cuenta ya ha sido confirmada" });
+    return res.status(409).json({ msg: "La cuenta ya ha sido confirmada" });
 
   administradorBDD.token = null;
   administradorBDD.confirmEmail = true;
@@ -128,7 +125,7 @@ const actualizarPerfil = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).json({ msg: "Debe ser un ID válido" });
+    return res.status(400).json({ msg: "Debe ser un ID válido" });
 
   if (Object.values(req.body).includes(""))
     return res.status(400).json({ msg: "Debes llenar todos los campos" });
@@ -149,7 +146,7 @@ const actualizarPerfil = async (req, res) => {
       email: req.body.email,
     });
     if (administradorBDDMail)
-      return res.status(404).json({ msg: "El email ya está registrado" });
+      return res.status(409).json({ msg: "El email ya está registrado" });
   }
 
   administradorBDD.nombre = req.body.nombre || administradorBDD?.nombre;
@@ -178,7 +175,7 @@ const actualizarPassword = async (req, res) => {
 
   const verificarPassword = await administradorBDD.matchPassword(passwordactual);
   if (!verificarPassword) {
-    return res.status(403).json({ msg: "La contraseña actual no es correcta" });
+    return res.status(401).json({ msg: "La contraseña actual no es correcta" });
   }
 
   administradorBDD.password = await administradorBDD.encrypPassword(passwordnuevo);
@@ -192,7 +189,7 @@ const recuperarPassword = async (req, res) => {
   const { email } = req.body;
 
   if (Object.values(req.body).includes(""))
-    return res.status(404).json({ msg: "Debes llenar todos los campos" });
+    return res.status(400).json({ msg: "Debes llenar todos los campos" });
 
   // Buscar en ambos modelos
   let user = await Administrador.findOne({ email });
@@ -209,26 +206,23 @@ const recuperarPassword = async (req, res) => {
   await sendMailToRecoveryPassword(email, token);
 
   res
-    .status(200)
-    .json({ msg: "Revisa tu correo electrónico para restablecer tu cuenta" });
+    .status(200).json({ msg: "Revisa tu correo electrónico para restablecer tu cuenta" });
 };
 // Método para comprobar el token
 const comprobarTokenPassword = async (req, res) => {
   const { token } = req.params;
   
   if (!token)
-    return res.status(404).json({ msg: "No se puede validar la cuenta" });
+    return res.status(400).json({ msg: "No se puede validar la cuenta" });
 
   // Buscar en ambos modelos
   let user = await Administrador.findOne({ token });
   if (!user) user = await Estudiante.findOne({ token });
 
   if (!user || user.token !== token)
-    return res.status(404).json({ msg: "No se puede validar la cuenta" });
+    return res.status(401).json({ msg: "Token invalido o expirado" });
 
-  res
-    .status(200)
-    .json({ msg: "Token confirmado, ya puedes crear tu nueva contraseña" });
+  res.status(200).json({ msg: "Token confirmado, ya puedes crear tu nueva contraseña" });
 };
 
 // Método para crear el nuevo password
@@ -237,17 +231,17 @@ const nuevoPassword = async (req, res) => {
   const { token } = req.params;
 
   if (Object.values(req.body).includes(""))
-    return res.status(404).json({ msg: "Debes llenar todos los campos" });
+    return res.status(400).json({ msg: "Debes llenar todos los campos" });
 
   if (password !== confirmpassword)
-    return res.status(404).json({ msg: "Las contraseñas no coinciden" });
+    return res.status(400).json({ msg: "Las contraseñas no coinciden" });
 
   // Buscar en ambos modelos
   let user = await Administrador.findOne({ token });
   if (!user) user = await Estudiante.findOne({ token });
 
   if (!user || user.token !== token)
-    return res.status(404).json({ msg: "No se puede validar la cuenta" });
+    return res.status(401).json({ msg: "Token inválido o expirado" });
 
   // Actualizar contraseña y eliminar token
   user.token = null;

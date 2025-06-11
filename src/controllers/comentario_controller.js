@@ -66,26 +66,45 @@ export const crearComentario = async (req, res) => {
   }
 };
 
-// Eliminar un comentario por su ID
+// Eliminar un comentario por su ID (solo el autor puede hacerlo)
 export const eliminarComentario = async (req, res) => {
   try {
-    // Extraemos el ID del comentario desde los parámetros de la ruta
     const { id } = req.params;
 
-    // Buscamos y eliminamos el comentario de la base de datos
-    const eliminado = await Comentario.findByIdAndDelete(id);
+    // Verificamos si el ID es válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID de comentario inválido" });
+    }
 
-    // Si no se encontró el comentario, respondemos con error 404
-    if (!eliminado) {
+    // Extraemos el token del header
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Token no proporcionado" });
+    }
+
+    // Verificamos el token y extraemos el ID del usuario
+    const { idToken } = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Buscamos el comentario en la base de datos
+    const comentario = await Comentario.findById(id);
+
+    if (!comentario) {
       return res.status(404).json({ error: "Comentario no encontrado" });
     }
 
-    // Confirmamos que el comentario fue eliminado exitosamente
+    // Verificamos si el usuario es el autor del comentario
+    if (comentario.usuario.toString() !== idToken) {
+      return res.status(403).json({ error: "No tienes permiso para eliminar este comentario" });
+    }
+
+    // Eliminamos el comentario
+    await Comentario.findByIdAndDelete(id);
+
     res.status(200).json({ mensaje: "Comentario eliminado correctamente" });
 
   } catch (error) {
-    // En caso de error, respondemos con estado 500 y mensaje de error
-    res.status(500).json({ error: "Error al eliminar el comentario" });
+    console.error("Error al eliminar comentario:", error);
+    res.status(500).json({ error: "Error interno al eliminar el comentario" });
   }
 };
 

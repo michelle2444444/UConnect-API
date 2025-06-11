@@ -173,7 +173,7 @@ const registrarEstudiante = async (req, res) => {
       await fs.remove(uploadDir);
     } catch (error) {
       return res
-        .status(500)
+        .status(502)
         .json({ msg: "Error al subir la foto de perfil a Cloudinary" });
     }
   }
@@ -198,7 +198,7 @@ const perfilEstudiante = async (req, res) => {
   );
   if (rol !== "Estudiante")
     return res
-      .status(404)
+      .status(403)
       .json({ msg: "No tienes permisos para realizar esta acción" });
   const estudianteBDD = await Estudiante.findById(idToken).populate(
     "amigos",
@@ -324,7 +324,7 @@ const eliminarEstudiante = async (req, res) => {
   );
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
-      .status(404)
+      .status(400)
       .json({ msg: `Lo sentimos, no existe el estudiante con ID ${id}` });
   }
 
@@ -349,8 +349,7 @@ const eliminarEstudiante = async (req, res) => {
     await estudiante.save();
 
     res
-      .status(200)
-      .json({ msg: "El estudiante ha sido dado de baja exitosamente" });
+      .status(200).json({ msg: "El estudiante ha sido dado de baja exitosamente" });
   } catch (error) {
     res.status(500).json({ msg: "Hubo un error en el servidor" });
   }

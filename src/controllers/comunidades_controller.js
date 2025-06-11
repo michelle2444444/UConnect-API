@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadDir = path.join(__dirname, "temp_uploads");
 
-// ✅ Crear la carpeta automáticamente si no existe
+// Crear la carpeta automáticamente si no existe
 fs.ensureDirSync(uploadDir);
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
@@ -127,7 +127,7 @@ const unirseComunidad = async (req, res) => {
     }
 
     if (comunidad.estudiantes.includes(estudianteId)) {
-      return res.status(400).json({ mensaje: "Ya eres miembro de esta comunidad" });
+      return res.status(409).json({ mensaje: "Ya eres miembro de esta comunidad" });
     }
 
     // Agregar al estudiante en la comunidad
@@ -197,8 +197,7 @@ const actualizarComunidad = async (req, res) => {
   }
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
-      .status(404)
-      .json({ msg: `Lo sentimos, no existe la comunidad con ID ${id}` });
+      .status(404).json({ msg: `Lo sentimos, no existe la comunidad con ID ${id}` });
   }
   try {
     const comunidad = await Comunidad.findById(id);

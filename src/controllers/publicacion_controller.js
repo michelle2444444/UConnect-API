@@ -45,7 +45,7 @@ export const crearPublicacion = async (req, res) => {
       error: error.message || error.toString()
     });
   }
-}; // <-- Aquí cierra crearPublicacion correctamente
+}; 
 
 // Ahora sí definir las otras funciones
 export const obtenerPublicaciones = async (req, res) => {
@@ -62,20 +62,37 @@ export const obtenerPublicaciones = async (req, res) => {
 
 export const eliminarPublicacion = async (req, res) => {
   try {
-    const publicacion = await Publicacion.findById(req.params.id);
+    const { id } = req.params;
+    const usuarioAutenticado = req.usuario.idToken;
 
+    // Buscar la publicación
+    const publicacion = await Publicacion.findById(id);
+
+    // Validar que exista
     if (!publicacion) {
       return res.status(404).json({ mensaje: 'Publicación no encontrada' });
     }
 
+    // Verificar que el usuario autenticado sea el autor de la publicación
+    if (publicacion.autor.toString() !== usuarioAutenticado) {
+      return res.status(403).json({ mensaje: 'No estás autorizado para eliminar esta publicación' });
+    }
+
+    // Eliminar imagen de Cloudinary si existe
     if (publicacion.imagen.public_id) {
       await cloudinary.uploader.destroy(publicacion.imagen.public_id);
     }
 
-    await Publicacion.findByIdAndDelete(req.params.id);
+    // Eliminar la publicación
+    await Publicacion.findByIdAndDelete(id);
 
     res.status(200).json({ mensaje: 'Publicación eliminada correctamente' });
+
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al eliminar publicación', error });
+    console.error('Error al eliminar publicación:', error);
+    res.status(500).json({
+      mensaje: 'Error interno al eliminar publicación',
+      error: error.message || error.toString()
+    });
   }
 };
