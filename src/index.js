@@ -17,7 +17,7 @@ app.use("/api/comentarios", comentariosRoutes);
 
 dotenv.config(); // Configurations
 app.set("port", process.env.PORT || 3000);
-const allowedOrigins = [process.env.URL_FRONTEND, 'http://localhost:5173', 'https://u-connect-epn.vercel.app'];
+const allowedOrigins = [process.env.URL_FRONTEND, 'http://localhost:5173', 'https://uconnect-api-s755.onrender.com'];
 
 app.use(
   cors({

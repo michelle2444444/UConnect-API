@@ -11,13 +11,8 @@ import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 // Rutas publicas
 router.post("/login", login);
-if (process.env.NODE_ENV === 'production') {
-    router.post("/registro" , (req, res) => {
-    res.status(403).json({ error: 'Esta ruta esta desactivada en produccion' });
-  });
-}else{
-  router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
-}
+router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
+
 
 router.get("/confirmar/:token", confirmEmail);
 router.post("/recuperar-password", recuperarPassword);
