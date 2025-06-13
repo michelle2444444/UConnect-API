@@ -11,8 +11,7 @@ import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 // Rutas publicas
 router.post("/login", login);
-router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
-
+  router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
 
 router.get("/confirmar/:token", confirmEmail);
 router.post("/recuperar-password", recuperarPassword);

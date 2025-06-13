@@ -19,9 +19,9 @@ router.delete("/estudiante/eliminar/:id", verificarAutenticacion,eliminarEstudia
 //Requiere permisos de Administrador reactivar a un estudiante
 router.get("/estudiantes/desactivado/", verificarAutenticacion,verificarAdmin,listarEstudiantesDesactivados);
 router.put("/estudiante/reactivar/:id", verificarAutenticacion,verificarAdmin,reactivarEstudiante);
-router.post("/recuperar-password", recuperarPassword);
-router.get("/recuperar-password/:token", comprobarTokenPassword);
-router.post("/nuevo-password/:token", nuevoPassword);
+router.post("/recuperar-password-estudiante", recuperarPassword);
+router.get("/recuperar-password-estudiante/:token", comprobarTokenPassword);
+router.post("/nuevo-password-estudiante/:token", nuevoPassword);
 router.put('/estudiante/actualizarpassword',verificarAutenticacion, actualizarPassword)
 router.post('/estudiante/:id/agregar', verificarAutenticacion, agregarAmigo);
 router.post('/estudiante/:id/eliminar', verificarAutenticacion, eliminarAmigo);
