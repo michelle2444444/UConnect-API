@@ -15,7 +15,7 @@ API para comunidades universitarias cercanas a la EPN (Escuela Politécnica Naci
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone 
+   git clone https://github.com/michelle2444444/UConnect-API.git
    cd api-restful-connect.
 
 Estructura del proyecto
