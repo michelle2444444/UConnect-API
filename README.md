@@ -1,4 +1,4 @@
-[# U-Connect API 📚
+# U-Connect API 📚
 
 API para comunidades universitarias cercanas a la EPN (Escuela Politécnica Nacional). Facilita la conexión entre estudiantes, gestión de comunidades, comentarios y mensajería en tiempo real.
 
