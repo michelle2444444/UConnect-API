@@ -101,7 +101,7 @@ Modo desarrollo (con Nodemon):
 | POST   | /api/mensaje/enviar/:id | Enviar mensajes. |
 | WebSocket | /socket.io/ | Enviar mensajes en tiempo real. |
 
-📝 Publicaciones
+## 📝 Publicaciones
 
 | Método | Endpoint               | Descripción                              |
 | ------ | ---------------------- | ---------------------------------------- |
