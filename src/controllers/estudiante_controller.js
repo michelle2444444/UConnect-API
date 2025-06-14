@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadDir = path.join(__dirname, "temp_uploads");
 
-// ✅ Crear la carpeta automáticamente si no existe
+// Crear la carpeta automáticamente si no existe
 fs.ensureDirSync(uploadDir);
 
 const fileFilter = (req, file, cb) => {
@@ -302,6 +302,14 @@ const actualizarEstudiante = async (req, res) => {
       ? JSON.parse(body.intereses)
       : estudiante?.intereses;
     estudiante.bio = body.bio || estudiante?.bio;
+
+    if (body.intereses !== undefined) {
+  if (Array.isArray(body.intereses)) {
+    estudiante.intereses = body.intereses;
+  } else {
+    estudiante.intereses = [body.intereses];
+  }
+}
 
     if (typeof body.fotoPerfil === "object" && body.fotoPerfil !== null) {
       estudiante.fotoPerfil = body.fotoPerfil;
