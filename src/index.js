@@ -9,7 +9,6 @@ import routerComentarios from "./routers/comentarios_routes.js";
 import routerMensajes from "./routers/mensajes_routes.js";
 import { app, server } from "./config/socket.js";
 import connection from "./database.js";
-import comentariosRoutes from "./routers/comentarios_routes.js";
 import routerPublicaciones from "./routers/publicaciones_routes.js";
 
 app.use("/api/comentarios", comentariosRoutes);
@@ -44,7 +43,9 @@ app.use("/api", routerComunidades);
 app.use("/api", routerComentarios);
 app.use("/api", routerMensajes);
 app.use("/api", routerPublicaciones);
-
+app.get("/api/health", (req, res) => {
+  res.send("API funcionando correctamente");
+});
 app.use((req, res) => res.status(404).send("Endpoint no encontrado - 404"));
 
 server.listen(app.get("port"), () => {
