@@ -9,6 +9,7 @@ import routerComentarios from "./routers/comentarios_routes.js";
 import routerMensajes from "./routers/mensajes_routes.js";
 import { app, server } from "./config/socket.js";
 import connection from "./database.js";
+import comentariosRoutes from "./routers/comentarios_routes.js";
 import routerPublicaciones from "./routers/publicaciones_routes.js";
 
 app.use("/api/comentarios", comentariosRoutes);
